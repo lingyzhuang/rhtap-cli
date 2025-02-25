@@ -21,9 +21,12 @@ type IntegrationAzure struct {
 
 	azureIntegration *integrations.AzureIntegration // azure integration
 
-	host  string // E.g. 'dev.azure.com'
-	token string // API token
-	org   string // Organization name
+	host         string // E.g. 'dev.azure.com'
+	token        string // API token
+	org          string // Organization name
+	clientId     string // Client ID
+	clientSecret string // Client Secret
+	tenantId     string // tenant ID
 }
 
 var _ Interface = &IntegrationAzure{}
