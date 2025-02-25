@@ -14,8 +14,8 @@ app:
 {{- $quaySecretData := ($quaySecretObj.data | default dict) }}
 {{- $nexusSecretObj := (lookup "v1" "Secret" $integrationNamespace "rhtap-nexus-integration") }}
 {{- $artifactorySecretObj := (lookup "v1" "Secret" $integrationNamespace "rhtap-artifactory-integration") }}
+{{- $azureSecretObj := (lookup "v1" "Secret" $integrationNamespace "rhtap-azure-integration")}}
 {{- $artifactorySecretData := ($artifactorySecretObj.data | default dict) }}
-{{- $azureSecretobj := (lookup "v1" "Secret" $integrationNamespace "rhtap-azure-integration")}}
 
 {{- if $argocdSecretData }}
 argocd:
@@ -32,6 +32,11 @@ argocd:
 {{- if $artifactorySecretObj }}
 artifactory:
   uiUrl: ${ARTIFACTORY__URL}
+{{- end }}
+{{- if $azureSecretObj }}
+azureDevOps:
+  host: ${AZURE__HOST}
+  organization: ${AZURE__ORG}
 {{- end }}
 auth:
   environment: production
@@ -85,10 +90,13 @@ catalog:
       - API
 dangerouslyAllowSignInWithoutUserInCatalog: true
 integrations:
-{{- if $azureSecretobj }}
+{{- if $azureSecretObj }}
   azure:
     - host: ${AZURE__HOST}
-      token: ${AZURE__TOKEN}
+      credentials:
+        - organizations:
+            - ${AZURE__ORG}
+          personalAccessToken: ${AZURE__TOKEN}
 {{- end }}
 {{- if $bbSecretObj }}
   bitbucketCloud:
