@@ -25,9 +25,12 @@ type AzureIntegration struct {
 
 	force bool // overwrite the existing secret
 
-	host  string // Azure host
-	token string // API token credentials
-	org   string // Azure organization name
+	host         string // Azure host
+	token        string // API token credentials
+	org          string // Azure organization name
+	clientId     string // Azure client ID
+	clientSecret string // Azure client secret
+	tenantId     string // Azure tenant ID
 }
 
 // PersistentFlags sets the persistent flags for the Azure integration.
@@ -41,6 +44,12 @@ func (g *AzureIntegration) PersistentFlags(p *pflag.FlagSet) {
 		"Azure API token")
 	p.StringVar(&g.org, "organization", g.org,
 		"Azure organization name")
+	p.StringVar(&g.clientId, "client-id", g.clientId,
+		"Azure client ID")
+	p.StringVar(&g.clientSecret, "client-secret", g.clientSecret,
+		"Azure client secret")
+	p.StringVar(&g.tenantId, "tenant-id", g.tenantId,
+		"Azure tenant ID")
 }
 
 // log logger with contextual information.
@@ -50,6 +59,9 @@ func (g *AzureIntegration) log() *slog.Logger {
 		"host", g.host,
 		"token-len", len(g.token),
 		"organization", g.org,
+		"clientId", g.clientId,
+		"clientSecret-len", len(g.clientSecret),
+		"tenantId-len", len(g.tenantId),
 	)
 }
 
@@ -58,12 +70,22 @@ func (g *AzureIntegration) Validate() error {
 	if g.host == "" {
 		g.host = defaultPublicAzureHost
 	}
-	if g.token == "" {
-		return fmt.Errorf("token is required")
+	if g.token == "" && g.clientId == "" {
+		return fmt.Errorf("either personal token or client-id is required")
+	}
+	if g.clientId == "" && (g.clientSecret != "" || g.tenantId != "") {
+		return fmt.Errorf("client-id is required when client-secret or tenant-id is specified")
+	}
+	if g.clientSecret == "" && g.tenantId != "" {
+		return fmt.Errorf("client-secret is required when tenant-id is specified")
+	}
+	if g.clientSecret != "" && g.tenantId == "" {
+		return fmt.Errorf("tenant-id is required when client-secret is specified")
 	}
 	if g.org == "" {
 		return fmt.Errorf("organization is required")
 	}
+
 	return nil
 }
 
@@ -122,6 +144,9 @@ func (g *AzureIntegration) store(
 			"host":         []byte(g.host),
 			"token":        []byte(g.token),
 			"organization": []byte(g.org),
+			"clientId":     []byte(g.clientId),
+			"clientSecret": []byte(g.clientSecret),
+			"tenantId":     []byte(g.tenantId),
 		},
 	}
 	logger := g.log().With(
@@ -162,9 +187,12 @@ func NewAzureIntegration(
 		cfg:    cfg,
 		kube:   kube,
 
-		force: false,
-		host:  "",
-		token: "",
-		org:   "",
+		force:        false,
+		host:         "",
+		token:        "",
+		org:          "",
+		clientId:     "",
+		clientSecret: "",
+		tenantId:     "",
 	}
 }

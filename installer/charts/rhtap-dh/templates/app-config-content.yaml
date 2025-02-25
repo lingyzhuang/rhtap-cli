@@ -14,8 +14,9 @@ app:
 {{- $quaySecretData := ($quaySecretObj.data | default dict) }}
 {{- $nexusSecretObj := (lookup "v1" "Secret" $integrationNamespace "rhtap-nexus-integration") }}
 {{- $artifactorySecretObj := (lookup "v1" "Secret" $integrationNamespace "rhtap-artifactory-integration") }}
-{{- $azureSecretObj := (lookup "v1" "Secret" $integrationNamespace "rhtap-azure-integration")}}
 {{- $artifactorySecretData := ($artifactorySecretObj.data | default dict) }}
+{{- $azureSecretObj := (lookup "v1" "Secret" $integrationNamespace "rhtap-azure-integration") }}
+{{- $azureSecretData := ($azureSecretObj.data | default dict) }}
 
 {{- if $argocdSecretData }}
 argocd:
@@ -94,9 +95,16 @@ integrations:
   azure:
     - host: ${AZURE__HOST}
       credentials:
-        - organizations:
-            - ${AZURE__ORG}
-          personalAccessToken: ${AZURE__TOKEN}
+      # If both personal token and client ID exist, use personal token
+      {{- if $azureSecretData.token }}
+        - personalAccessToken: ${AZURE__TOKEN}
+      {{- else }}
+        - clientId: ${AZURE__CLIENT__ID}
+        {{- if $azureSecretData.clientSecret }}
+          clientSecret: ${AZURE__CLIENT__SECRET}
+          tenantId: ${AZURE__TENANT__ID}
+        {{- end }}
+      {{- end }}
 {{- end }}
 {{- if $bbSecretObj }}
   bitbucketCloud:
