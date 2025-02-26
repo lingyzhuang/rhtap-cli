@@ -34,6 +34,8 @@ plugins:
     package: ./dynamic-plugins/dist/backstage-community-plugin-azure-devops-backend-dynamic
   - disabled: false
     package: ./dynamic-plugins/dist/backstage-community-plugin-azure-devops
+  - disabled: false
+    package: ./dynamic-plugins/dist/parfuemerie-douglas-scaffolder-backend-module-azure-repositories-dynamic
 {{- end }}
   #
   # CI
@@ -93,6 +95,8 @@ plugins:
     package: ./dynamic-plugins/dist/backstage-plugin-scaffolder-backend-module-github-dynamic
   - disabled: false
     package: ./dynamic-plugins/dist/backstage-plugin-scaffolder-backend-module-gitlab-dynamic
+  - disabled: false
+    package: ./dynamic-plugins/dist/backstage-plugin-scaffolder-backend-module-azure-dynamic
   #
   # Image Registry
   #
