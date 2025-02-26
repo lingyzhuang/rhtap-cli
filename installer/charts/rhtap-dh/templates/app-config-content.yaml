@@ -66,6 +66,16 @@ auth:
         clientSecret: ${GITLAB__APP__CLIENT__SECRET}
     {{- end }}
   {{- end }}
+  {{- if $azureSecretData }}
+    {{- if and $azureSecretData.clientSecret $azureSecretData.tenantId }}
+    {{- $signInPage = "microsoft" }}
+    microsoft:
+      production:
+        clientId: ${AZURE__CLIENT__ID}
+        clientSecret: ${AZURE__CLIENT__SECRET}
+        tenantId: ${AZURE__TENANT__ID}
+    {{- end }}
+  {{- end }}
 backend:
   auth:
     keys:
@@ -100,7 +110,7 @@ integrations:
         - personalAccessToken: ${AZURE__TOKEN}
       {{- else }}
         - clientId: ${AZURE__CLIENT__ID}
-        {{- if $azureSecretData.clientSecret }}
+        {{- if and $azureSecretData.clientSecret $azureSecretData.tenantId }}
           clientSecret: ${AZURE__CLIENT__SECRET}
           tenantId: ${AZURE__TENANT__ID}
         {{- end }}
