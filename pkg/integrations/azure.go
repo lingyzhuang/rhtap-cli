@@ -70,8 +70,8 @@ func (g *AzureIntegration) Validate() error {
 	if g.host == "" {
 		g.host = defaultPublicAzureHost
 	}
-	if g.token == "" && g.clientId == "" {
-		return fmt.Errorf("either personal token or client-id is required")
+	if g.token == "" {
+		return fmt.Errorf("personal access token is required")
 	}
 	if g.clientId == "" && (g.clientSecret != "" || g.tenantId != "") {
 		return fmt.Errorf("client-id is required when client-secret or tenant-id is specified")
