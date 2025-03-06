@@ -18,6 +18,9 @@ quay:
   secret:
     namespace: __OVERWRITE_ME__
     name: __OVERWRITE_ME__
+  # Quay robot name for admin
+  robot:
+    name: rhtap-robot
   # Quay configuration bundle.
   config:
     # To support MinIO S3 instance, the RADOS Gateway (RGW) storage is used
