@@ -26,15 +26,6 @@ plugins:
           - type: 'config'
             instances: []
 {{- end }}
-{{- if (lookup "v1" "Secret" $integrationNamespace "rhtap-azure-integration") }}
-  #
-  # Azure
-  #
-  - disabled: false
-    package: ./dynamic-plugins/dist/backstage-community-plugin-azure-devops-backend-dynamic
-  - disabled: false
-    package: ./dynamic-plugins/dist/backstage-community-plugin-azure-devops
-{{- end }}
   #
   # CI
   #
@@ -54,6 +45,12 @@ plugins:
                     gridRowStart: 1
                 importName: TektonCI
                 mountPoint: entity.page.ci/cards
+{{- if (lookup "v1" "Secret" $integrationNamespace "rhtap-azure-integration") }}
+  - disabled: false
+    package: ./dynamic-plugins/dist/backstage-community-plugin-azure-devops-backend-dynamic
+  - disabled: false
+    package: ./dynamic-plugins/dist/backstage-community-plugin-azure-devops
+{{- end }}
 {{- if (lookup "v1" "Secret" $integrationNamespace "rhtap-github-integration") }}
   - disabled: false
     package: ./dynamic-plugins/dist/backstage-community-plugin-github-actions
@@ -93,7 +90,7 @@ plugins:
     package: ./dynamic-plugins/dist/backstage-plugin-scaffolder-backend-module-github-dynamic
   - disabled: false
     package: ./dynamic-plugins/dist/backstage-plugin-scaffolder-backend-module-gitlab-dynamic
-  - disabled: false
+  - disabled: true
     package: ./dynamic-plugins/dist/backstage-plugin-scaffolder-backend-module-azure-dynamic
   #
   # Image Registry

@@ -34,9 +34,13 @@ data:
     AZURE__HOST : {{ $azureSecretData.host }}
     AZURE__ORG : {{ $azureSecretData.organization }}
     AZURE__TOKEN: {{ $azureSecretData.token }}
+    {{- if $azureSecretData.clientId }}
     AZURE__CLIENT__ID: {{ $azureSecretData.clientId }}
+    {{- end }}
+    {{- if and $azureSecretData.clientSecret $azureSecretData.tenantId }}
     AZURE__CLIENT__SECRET: {{ $azureSecretData.clientSecret }}
     AZURE__TENANT__ID: {{ $azureSecretData.tenantId }}
+    {{- end }}
 {{- end }}
 {{- $bbSecretObj := (lookup "v1" "Secret" $integrationNamespace "rhtap-bitbucket-integration") }}
 {{- $bbSecretData := ($bbSecretObj.data | default dict) }}

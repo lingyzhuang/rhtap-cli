@@ -43,6 +43,16 @@ auth:
   environment: production
   providers:
   {{- $signInPage := "" }}
+  {{- if $azureSecretData }}
+    {{- if and $azureSecretData.clientId $azureSecretData.clientSecret $azureSecretData.tenantId }}
+    {{- $signInPage = "microsoft" }}
+    microsoft:
+      production:
+        clientId: ${AZURE__CLIENT__ID}
+        clientSecret: ${AZURE__CLIENT__SECRET}
+        tenantId: ${AZURE__TENANT__ID}
+    {{- end }}
+  {{- end }}
   {{- if $githubSecretObj }}
     {{- $signInPage = "github" }}
     github:
@@ -64,16 +74,6 @@ auth:
       {{- end }}
         clientId: ${GITLAB__APP__CLIENT__ID}
         clientSecret: ${GITLAB__APP__CLIENT__SECRET}
-    {{- end }}
-  {{- end }}
-  {{- if $azureSecretData }}
-    {{- if and $azureSecretData.clientId $azureSecretData.clientSecret $azureSecretData.tenantId }}
-    {{- $signInPage = "microsoft" }}
-    microsoft:
-      production:
-        clientId: ${AZURE__CLIENT__ID}
-        clientSecret: ${AZURE__CLIENT__SECRET}
-        tenantId: ${AZURE__TENANT__ID}
     {{- end }}
   {{- end }}
 backend:
