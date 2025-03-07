@@ -34,6 +34,11 @@ declare -r SECRET_NAME="${SECRET_NAME:-}"
 # set with the user's access token obtained from Quay.
 declare ACCESS_TOKEN=""
 
+# Quay robot account for register
+declare QUAY_ROBOT_SHORT_NAME="${QUAY_ROBOT_SHORT_NAME:-rhtaprobot}"
+declare QUAY_ROBOT_USERNAME=""
+declare QUAY_ROBOT_TOKEN=""
+
 #
 # Functions
 #
@@ -162,8 +167,8 @@ quay_create_secret() {
         oc create secret docker-registry "${SECRET_NAME}" \
             --namespace="${NAMESPACE}" \
             --docker-server="${QUAY_HOSTNAME}" \
-            --docker-username="${QUAY_USERNAME}" \
-            --docker-password="${QUAY_PASSWORD}" \
+            --docker-username="${QUAY_ROBOT_USERNAME}" \
+            --docker-password="${QUAY_ROBOT_TOKEN}" \
             --docker-email="${QUAY_EMAIL}" \
             --dry-run=client \
             --output=yaml |
@@ -199,6 +204,66 @@ quay_create_secret() {
     return 1
 }
 
+# Create a robot account for user (QUAY_USERNAME) with the name informed
+# via environment, using the super-user's ACCESS_TOKEN to authorize the request.
+quay_create_robot_account() {
+    local quay_url="https://${QUAY_HOSTNAME}/api/v1/user/robots/${QUAY_ROBOT_SHORT_NAME}"
+    local data=(
+        "{"
+        "\"description\": \"Quay robot account for ${QUAY_USERNAME}\","
+        "\"unstructured_metadata\": {}"
+        "}"
+    )
+    local create_response token
+
+    info "Check if robot account ${QUAY_ROBOT_SHORT_NAME} already exists..."
+    create_response=$(
+        curl \
+            --silent \
+            --insecure \
+            --location \
+            --request GET \
+            --header 'Content-Type: application/json' \
+            --header "Authorization: Bearer ${ACCESS_TOKEN}" \
+            "${quay_url}"
+    )
+
+    if [[ -z "${create_response}" || "${create_response}" != *"created"* ]]; then
+        # Robot account not exists, create one
+        info "Creating Quay robot account ${QUAY_ROBOT_SHORT_NAME}..."
+        create_response=$(
+            curl \
+                --silent \
+                --insecure \
+                --location \
+                --request PUT \
+                --header 'Content-Type: application/json' \
+                --header "Authorization: Bearer ${ACCESS_TOKEN}" \
+                --data "${data[*]}" \
+                "${quay_url}"
+        )
+    fi
+
+    if [[ -z "${create_response}" || "${create_response}" != *"created"* ]]; then
+        warn "Failed to create robot account!"
+        return 1
+    fi
+
+    info "Extracting token from the response..."
+    # When response doesn't contain the expected "token", the script should
+    # fail completely.
+    token=$(echo "${create_response}" | jq --raw-output '.token')
+    if [[ -z "${token}" || "${token}" == "null" ]]; then
+        warn "Failed to get robot account token!"
+        return 1
+    fi
+
+    info "Robot account created successfully!"
+    export QUAY_ROBOT_TOKEN="${token}"
+    export QUAY_ROBOT_USERNAME="${QUAY_USERNAME}+${QUAY_ROBOT_SHORT_NAME}"
+    return 0
+}
+
 # Initializes the Quay super-user and creates a "docker-registry" secret with the
 # credentials informed via environment variables.
 quay_helper() {
@@ -219,6 +284,11 @@ quay_helper() {
         warn "Secret already exists, Quay has already been initialized!"
         return 0
     fi
+
+    quay_create_robot_account || {
+        warn "Failed to create robot account!"
+        return 1
+    }
 
     quay_create_secret || {
         warn "Failed to create secret!"

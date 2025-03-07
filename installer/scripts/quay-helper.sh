@@ -36,7 +36,7 @@ declare ACCESS_TOKEN=""
 
 # Quay robot account for register
 declare QUAY_ROBOT_SHORT_NAME="${QUAY_ROBOT_SHORT_NAME:-rhtaprobot}"
-declare QUAY_ROBOT_USERNAME =""
+declare QUAY_ROBOT_USERNAME=""
 declare QUAY_ROBOT_TOKEN=""
 
 #
@@ -228,7 +228,7 @@ quay_create_robot_account() {
             "${quay_url}"
     )
 
-    if [[ -z "${create_response}" || "${create_response}" != *"Created"* ]]; then
+    if [[ -z "${create_response}" || "${create_response}" != *"created"* ]]; then
         # Robot account not exists, create one
         info "Creating Quay robot account ${QUAY_ROBOT_SHORT_NAME}..."
         create_response=$(
@@ -244,7 +244,7 @@ quay_create_robot_account() {
         )
     fi
 
-    if [[ -z "${create_response}" || "${create_response}" != *"Created"* ]]; then
+    if [[ -z "${create_response}" || "${create_response}" != *"created"* ]]; then
         warn "Failed to create robot account!"
         return 1
     fi
