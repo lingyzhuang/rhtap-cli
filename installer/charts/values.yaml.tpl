@@ -100,6 +100,7 @@ minIOOperator:
 {{- $tpaKafkaSecretName := "tpa-kafka" }}
 {{- $tpaKafkaBootstrapServers := "tpa-kafka-bootstrap:9092" }}
 {{- $tpaMinIORootSecretName := "tpa-minio-root-env" }}
+{{- $tpaBucketName := "trustify-tpa" }}
 
 {{- $quayMinIOSecretName := "quay-minio-root-user"  }}
 
@@ -137,7 +138,7 @@ infrastructure:
     keycloak:
       enabled: {{ $keycloak.Enabled }}
       namespace: {{ $keycloak.Namespace }}
-    guac:
+    tpa:
       enabled: {{ $tpa.Enabled }}
       namespace: {{ $tpa.Namespace }}
   openShiftPipelines:
@@ -306,10 +307,11 @@ developerHub:
 #
 
 {{- $tpaAppDomain := printf "-%s.%s" $tpa.Namespace $ingressDomain }}
-{{- $tpaGUACDatabaseSecretName := "guac-pguser-guac" }}
+{{- $tpaDatabaseSecretName := "tpa-pguser-tpa" }}
 {{- $tpaOIDCClientsSecretName := "tpa-realm-chicken-clients" }}
 {{- $tpaTestingUsersEnabled := false }}
 {{- $tpaRealmPath := "realms/chicken" }}
+{{- $tpaStorageType := "s3" }}
 {{- $protocol := "https" -}}
 {{- if $crc.Enabled }}
   {{- $protocol = "http" }}
@@ -355,29 +357,34 @@ redhat-trusted-profile-analyzer:
     # In practice it toggles "https" vs. "http" for TPA components, for CRC it's
     # easier to focus on "http" communication only.
     useServiceCa: {{ not $crc.Enabled }}
-  guac: &tpaGUAC
-    database: &guacDatabase
-      name:
-        valueFrom:
-          secretKeyRef:
-            name: {{ $tpaGUACDatabaseSecretName }}
-      host:
-        valueFrom:
-          secretKeyRef:
-            name: {{ $tpaGUACDatabaseSecretName }}
-      port:
-        valueFrom:
-          secretKeyRef:
-            name: {{ $tpaGUACDatabaseSecretName}}
-      username:
-        valueFrom:
-          secretKeyRef:
-            name: {{ $tpaGUACDatabaseSecretName }}
-      password:
-        valueFrom:
-          secretKeyRef:
-            name: {{ $tpaGUACDatabaseSecretName }}
-    initDatabase: *guacDatabase
+  database: &tpaDatabase
+    name:
+      valueFrom:
+        secretKeyRef:
+          name: {{ $tpaDatabaseSecretName }}
+          key: dbname
+    host:
+      valueFrom:
+        secretKeyRef:
+          name: {{ $tpaDatabaseSecretName }}
+          key: host
+    port:
+      valueFrom:
+        secretKeyRef:
+          name: {{ $tpaDatabaseSecretName}}
+          key: port
+    username:
+      valueFrom:
+        secretKeyRef:
+          name: {{ $tpaDatabaseSecretName }}
+          key: user
+    password:
+      valueFrom:
+        secretKeyRef:
+          name: {{ $tpaDatabaseSecretName }}
+          key: password
+  createDatabase: *tpaDatabase
+  migrateDatabase: *tpaDatabase
   storage: &tpaStorage
     endpoint: {{ printf "http://minio.%s.svc.cluster.local:80" $tpa.Namespace }}
     accessKey:
@@ -388,14 +395,8 @@ redhat-trusted-profile-analyzer:
       valueFrom:
         secretKeyRef:
           name: {{ $tpaMinIORootSecretName }}
-  eventBus:
-    bootstrapServers: {{ $tpaKafkaBootstrapServers }}
-    config:
-      username: {{ $tpaKafkaSecretName }}
-      password:
-        valueFrom:
-          secretKeyRef:
-            name: {{ $tpaKafkaSecretName }}
+    bucket: {{ $tpaBucketName }}
+    type: {{ $tpaStorageType }}
   oidc: &tpaOIDC
 {{- if $crc.Enabled }}
     issuerUrl: {{ printf "http://%s/%s" $keycloakRouteHost $tpaRealmPath }}
@@ -429,7 +430,6 @@ trustification:
   openshift: *tpaOpenShift
   storage: *tpaStorage
   oidc: *tpaOIDC
-  guac: *tpaGUAC
   ingress: *tpaIngress
   tls:
     serviceEnabled: "{{ not $crc.Enabled }}"
