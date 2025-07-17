@@ -10,16 +10,16 @@ plugins:
   # ArgoCD
   #
   - disabled: false
-    package: ./dynamic-plugins/dist/backstage-community-plugin-redhat-argocd
+    package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/backstage-community-plugin-redhat-argocd:bs_1.35.1__1.17.0!backstage-community-plugin-redhat-argocd
   - disabled: false
-    package: ./dynamic-plugins/dist/roadiehq-backstage-plugin-argo-cd-backend-dynamic
+    package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/roadiehq-backstage-plugin-argo-cd-backend:bs_1.35.1__3.3.1!roadiehq-backstage-plugin-argo-cd-backend
     pluginConfig:
       argocd:
         appLocatorMethods:
           - type: 'config'
             instances: []
   - disabled: false
-    package: ./dynamic-plugins/dist/roadiehq-scaffolder-backend-argocd-dynamic
+    package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/roadiehq-scaffolder-backend-argocd:bs_1.35.1__1.5.0!roadiehq-scaffolder-backend-argocd
     pluginConfig:
       argocd:
         appLocatorMethods:
@@ -30,7 +30,7 @@ plugins:
   # CI
   #
   - disabled: false
-    package: ./dynamic-plugins/dist/backstage-community-plugin-tekton
+    package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/backstage-community-plugin-tekton:bs_1.35.1__3.21.1!backstage-community-plugin-tekton
     pluginConfig:
       dynamicPlugins:
         frontend:
@@ -47,9 +47,9 @@ plugins:
                 mountPoint: entity.page.ci/cards
 {{- if (lookup "v1" "Secret" $integrationNamespace "tssc-azure-integration") }}
   - disabled: false
-    package: ./dynamic-plugins/dist/backstage-community-plugin-azure-devops-backend-dynamic
+    package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/backstage-community-plugin-azure-devops-backend:bs_1.35.1__0.11.0!backstage-community-plugin-azure-devops-backend
   - disabled: false
-    package: ./dynamic-plugins/dist/backstage-community-plugin-azure-devops
+    package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/backstage-community-plugin-azure-devops:bs_1.35.1__0.9.0!backstage-community-plugin-azure-devops
     # The default pluginConfig also includes EntityAzurePullRequestsContent which is not supported
     # in TSSC and causes 500 errors when loading the PR/MR tab:
     # https://issues.redhat.com/browse/RHTAP-4837
@@ -69,17 +69,17 @@ plugins:
 {{- end }}
 {{- if (lookup "v1" "Secret" $integrationNamespace "tssc-github-integration") }}
   - disabled: false
-    package: ./dynamic-plugins/dist/backstage-community-plugin-github-actions
+    package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/backstage-community-plugin-github-actions:bs_1.35.1__0.7.2!backstage-community-plugin-github-actions
 {{- end }}
 {{- if (lookup "v1" "Secret" $integrationNamespace "tssc-gitlab-integration") }}
   - disabled: false
-    package: ./dynamic-plugins/dist/immobiliarelabs-backstage-plugin-gitlab
+    package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/immobiliarelabs-backstage-plugin-gitlab:bs_1.35.1__6.8.0!immobiliarelabs-backstage-plugin-gitlab
   - disabled: false
-    package: ./dynamic-plugins/dist/immobiliarelabs-backstage-plugin-gitlab-backend-dynamic
+    package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/immobiliarelabs-backstage-plugin-gitlab-backend:bs_1.35.1__6.8.0!immobiliarelabs-backstage-plugin-gitlab-backend
 {{- end }}
 {{- if (lookup "v1" "Secret" $integrationNamespace "tssc-jenkins-integration") }}
   - disabled: false
-    package: ./dynamic-plugins/dist/backstage-community-plugin-jenkins
+    package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/backstage-community-plugin-jenkins:bs_1.35.1__0.16.0!backstage-community-plugin-jenkins
     pluginConfig:
       dynamicPlugins:
         frontend:
@@ -94,7 +94,7 @@ plugins:
                     allOf:
                       - isJenkinsAvailable
   - disabled: false
-    package: ./dynamic-plugins/dist/backstage-community-plugin-jenkins-backend-dynamic
+    package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/backstage-community-plugin-jenkins-backend-dynamic:bs_1.35.1__0.11.0!backstage-community-plugin-jenkins-backend-dynamic
 {{- end }}
   - disabled: false
     package: oci://registry.redhat.io/rhtap-backstage-plugins/rhtap-backstage-plugins-artifacts:1.5.0!rhtap-plugins-backstage-community-plugin-multi-source-security-viewer-dynamic
@@ -121,33 +121,33 @@ plugins:
   #
   # The all the git plugins are always enabled as they are referenced by the default templates
   - disabled: false
-    package: ./dynamic-plugins/dist/backstage-plugin-scaffolder-backend-module-bitbucket-cloud-dynamic
+    package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/backstage-plugin-scaffolder-backend-module-bitbucket-cloud:bs_1.35.1__0.2.5!backstage-plugin-scaffolder-backend-module-bitbucket-cloud
   - disabled: false
-    package: ./dynamic-plugins/dist/backstage-plugin-scaffolder-backend-module-github-dynamic
+    package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/backstage-plugin-scaffolder-backend-module-github:bs_1.35.1__0.5.5!backstage-plugin-scaffolder-backend-module-github
   - disabled: false
-    package: ./dynamic-plugins/dist/backstage-plugin-scaffolder-backend-module-gitlab-dynamic
+    package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/backstage-plugin-scaffolder-backend-module-gitlab:bs_1.35.1__0.7.1!backstage-plugin-scaffolder-backend-module-gitlab
   #
   # Image Registry
   #
 {{- if (lookup "v1" "Secret" $integrationNamespace "tssc-artifactory-integration") }}
   - disabled: false
-    package: ./dynamic-plugins/dist/backstage-community-plugin-jfrog-artifactory
+    package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/backstage-community-plugin-jfrog-artifactory:bs_1.35.1__1.13.3!backstage-community-plugin-jfrog-artifactory
 {{- end }}
 {{- if (lookup "v1" "Secret" $integrationNamespace "tssc-nexus-integration") }}
   - disabled: false
-    package: ./dynamic-plugins/dist/backstage-community-plugin-nexus-repository-manager
+    package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/backstage-community-plugin-nexus-repository-manager:bs_1.35.1__1.12.1!backstage-community-plugin-nexus-repository-manager
 {{- end }}
 {{- if (lookup "v1" "Secret" $integrationNamespace "tssc-quay-integration") }}
   - disabled: false
-    package: ./dynamic-plugins/dist/backstage-community-plugin-quay
+    package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/backstage-community-plugin-quay:bs_1.35.1__1.18.1!backstage-community-plugin-quay
 {{- end }}
   #
   # Kubernetes
   #
   - disabled: false
-    package: ./dynamic-plugins/dist/backstage-plugin-kubernetes
+    package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/backstage-plugin-kubernetes:bs_1.35.1__0.12.3!backstage-plugin-kubernetes
   - disabled: false
-    package: ./dynamic-plugins/dist/backstage-plugin-kubernetes-backend-dynamic
+    package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/backstage-plugin-kubernetes-backend:bs_1.35.1__0.19.2!backstage-plugin-kubernetes-backend
     pluginConfig:
       kubernetes:
         clusterLocatorMethods:
@@ -174,15 +174,15 @@ plugins:
         serviceLocatorMethod:
           type: multiTenant
   - disabled: false
-    package: ./dynamic-plugins/dist/backstage-community-plugin-topology
+    package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/backstage-community-plugin-topology:bs_1.35.1__1.32.0!backstage-community-plugin-topology
   #
   # RBAC
   #
   {{- $githubSecretObj := (lookup "v1" "Secret" $integrationNamespace "tssc-github-integration") }}
   {{- if and .Values.developerHub.RBAC.enabled $githubSecretObj }}
-  - package: ./dynamic-plugins/dist/backstage-community-plugin-rbac
+  - package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/backstage-community-plugin-rbac:bs_1.35.1__1.38.3!backstage-community-plugin-rbac
     disabled: false
-  - package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-github-org-dynamic
+  - package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/backstage-plugin-catalog-backend-module-github-org:bs_1.35.1__0.3.6!backstage-plugin-catalog-backend-module-github-org
     disabled: false
     pluginConfig:
       catalog:
@@ -193,7 +193,7 @@ plugins:
   # Tech Docs
   #
   - disabled: false
-    package: ./dynamic-plugins/dist/backstage-plugin-techdocs
+    package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/backstage-plugin-techdocs:bs_1.35.1__1.12.2!backstage-plugin-techdocs
   - disabled: false
-    package: ./dynamic-plugins/dist/backstage-plugin-techdocs-backend-dynamic
+    package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/backstage-plugin-techdocs-backend:bs_1.35.1__1.11.5!backstage-plugin-techdocs-backend
 {{- end }}
